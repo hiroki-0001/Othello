@@ -6,6 +6,73 @@ from matplotlib import pyplot as plt
 from enum import IntEnum
 
 ###
+### 入出力用のclass・Enumの定義
+###
+class DiscColor(IntEnum):
+    """
+    石の色用
+    """
+    BLACK = 0
+    WHITE = 1
+    
+class Hint():
+    """
+    認識するにあたってアプリ側から与えるヒント情報
+    """
+    def __init__(self):
+        # 35mm換算焦点距離[float]
+        self.focal = None
+        # 画像上の中心点[(int,int)]
+        self.center = None
+        # 認識モード[Mode]
+        self.mode = None
+    
+class Disc():
+    """
+    石の情報格納用
+    """
+    def __init__(self):
+        # 石の色[DiscColor]
+        self.color = None
+        # 石の座標。盤の左上原点で単位は盤の1辺[(float, float)]Y座標、X座標の順
+        self.position = None
+        # 対応する盤のマスの位置[(int, int)]Y座標、X座標の順
+        self.cell = None
+
+class Result():
+    """
+    認識結果
+    """
+    def __init__(self):
+        # 検出した石の情報[List[Disc]]
+        self.disc = []
+        # 不明マス(手などの障害物が写っている等)[boolの2次元配列]
+        self.isUnknown = np.array([[False] * 8 for i in range(8)])
+
+        # 写真上での盤の頂点の座標[List[(float, float)]]
+        self.vertex = []
+
+        # カメラ位置を原点とした時の盤の4頂点の3次元座標(カメラ座標系。単位=盤の1辺)[List[(float, float, float)]]
+        self.vertex3d = []
+
+        # 画像変換後の左上を原点とした時のカメラ位置を盤上に投影した点の2次元座標(単位px)[(float, float)]
+        # 実際の盤の写真だと、斜めから撮った際に石の厚みで石がきれいな円にならないので、
+        # 天面や底面を判定するために使用する。Y座標、X座標の順
+        self.cameraPosition_px = None
+
+        # 盤の中心を原点とした時のカメラ位置(単位=盤の1辺)[(float, float, float)]
+        # AR処理で使用することを想定(本モジュール外)
+        self.cameraPosition_bd = None
+
+        # どのRecognizerで処理を行ったかを表す
+        # AutomaticRecognizerでanalyzeまたはdetectBoardした場合のみ設定される
+        self.recognizerType = None
+
+    def clearDiscInfo(self):
+        self.disc = []
+        self.isUnknown = np.array([[False] * 8 for i in range(8)])
+
+###
 ### ユーティリティ的な関数の定義
 ###
 def intersection(line0, line1):
@@ -124,72 +191,9 @@ def getParallelogramRatio(vtx, center, img_size, focal, img_center):
     rad = math.acos(np.dot(v1_d - v0_d, v3_d - v0_d) / (np.linalg.norm(v1_d - v0_d) * np.linalg.norm(v3_d - v0_d)))
     return ratio, rad, np.array([v0_d, v1_d, v2_d, v3_d])
 
-class Hint():
-    """
-    認識するにあたってアプリ側から与えるヒント情報
-    """
-    def __init__(self):
-        # 35mm換算焦点距離[float]
-        self.focal = None
-        # 画像上の中心点[(int,int)]
-        self.center = None
-        # 認識モード[Mode]
-        self.mode = None
-
-class DiscColor(IntEnum):
-    """
-    石の色用
-    """
-    BLACK = 0
-    WHITE = 1
-    
-class Disc():
-    """
-    石の情報格納用
-    """
-    def __init__(self):
-        # 石の色[DiscColor]
-        self.color = None
-        # 石の座標。盤の左上原点で単位は盤の1辺[(float, float)]Y座標、X座標の順
-        self.position = None
-        # 対応する盤のマスの位置[(int, int)]Y座標、X座標の順
-        self.cell = None
-
-class Result():
-    """
-    認識結果
-    """
-    
-    def __init__(self):
-        # 検出した石の情報[List[Disc]]
-        self.disc = []
-        # 不明マス(手などの障害物が写っている等)[boolの2次元配列]
-        self.isUnknown = np.array([[False] * 8 for i in range(8)])
-
-        # 写真上での盤の頂点の座標[List[(float, float)]]
-        self.vertex = []
-
-        # カメラ位置を原点とした時の盤の4頂点の3次元座標(カメラ座標系。単位=盤の1辺)[List[(float, float, float)]]
-        self.vertex3d = []
-
-        # 画像変換後の左上を原点とした時のカメラ位置を盤上に投影した点の2次元座標(単位px)[(float, float)]
-        # 実際の盤の写真だと、斜めから撮った際に石の厚みで石がきれいな円にならないので、
-        # 天面や底面を判定するために使用する。Y座標、X座標の順
-        self.cameraPosition_px = None
-
-        # 盤の中心を原点とした時のカメラ位置(単位=盤の1辺)[(float, float, float)]
-        # AR処理で使用することを想定(本モジュール外)
-        self.cameraPosition_bd = None
-
-        # どのRecognizerで処理を行ったかを表す
-        # AutomaticRecognizerでanalyzeまたはdetectBoardした場合のみ設定される
-        self.recognizerType = None
-
-    def clearDiscInfo(self):
-        self.disc = []
-        self.isUnknown = np.array([[False] * 8 for i in range(8)])
-
-
+###
+### 認識用のクラスの定義
+###
 
 class Recognizer():
     

@@ -1,28 +1,28 @@
 import numpy as np
 import cv2
-import vision as vi
+import OthelloRecognizerSystem as ors
 import matplotlib.pyplot as plt
 
-hint = vi.Hint()
+hint = ors.Hint()
 
 image = cv2.imread("image/sample1.JPG")
 
-vision = vi.Recognizer()
-ret, result = vision.analyzeBoard(image, hint)
+recognizer = ors.Recognizer()
+ret, result = recognizer.analyzeBoard(image, hint)
 
 if ret:
     # 成功した場合は結果を描画
     CELL = 40
     SIZE = CELL * 8
     # 盤の部分を切り出し
-    board = vision.extractBoard(image, result.vertex, (SIZE, SIZE))
+    board = recognizer.extractBoard(image, result.vertex, (SIZE, SIZE))
     
     # 結果を配列に格納する。-2:不明、-1:空き、0:黒、1:白
     bd = np.ones((8, 8), dtype=np.int8) * -1
     bd[result.isUnknown == True] = -2
     for d in result.disc:
         # 配列を更新しつつ、石の場所に円を描画
-        if d.color == vi.DiscColor.BLACK:
+        if d.color == ors.DiscColor.BLACK:
             color = (0, 0, 0)
             line = (255, 255, 255)
         else:
