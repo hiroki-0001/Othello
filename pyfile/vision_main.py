@@ -17,8 +17,8 @@ if ret:
     # 盤の部分を切り出し
     board = recognizer.extractBoard(image, result.vertex, (SIZE, SIZE))
     
-    # 結果を配列に格納する。-2:不明、-1:空き、0:黒、1:白
-    bd = np.ones((8, 8), dtype=np.int8) * -1
+    # 結果を配列に格納する。-2:不明、0:空き、-1:黒、1:白
+    bd = np.ones((8, 8), dtype=np.int8) * 0
     bd[result.isUnknown == True] = -2
     for d in result.disc:
         # 配列を更新しつつ、石の場所に円を描画
@@ -39,15 +39,16 @@ if ret:
         for i in range(0, 8):
             x = int((i + 0.5) * CELL)
             y = int((j + 0.5) * CELL)
-            if bd[j, i] == -1:
+            if bd[j, i] == 0:
                 # 空きマス
                 cv2.rectangle(board, (x - 4, y - 4), (x + 4, y + 4), (0, 255, 0), -1)
             elif bd[j, i] == -2:
                 # 不明マス
                 cv2.rectangle(board, (x - 4, y - 4), (x + 4, y + 4), (128, 128, 128), -1)
+    print(bd)
     board = cv2.cvtColor(board, cv2.COLOR_BGR2RGB)
     plt.imshow(board)
     plt.show()
-    plt.imsave('vision2.png', board)
+    plt.imsave('vision.png', board)
 else:
     print("正常に認識できませんでした")

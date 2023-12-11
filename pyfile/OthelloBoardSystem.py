@@ -1,18 +1,36 @@
 import numpy as np
+from enum import IntEnum
 
+class DiscColor(IntEnum):
+    """
+    石の色用
+    """
+    BLACK = -1
+    WHITE = 1
+    EMPTY = 0
+    
+class Disc():
+    """
+    石の情報格納用
+    """
+    def __init__(self):
+        # 石の色[DiscColor]
+        self.color = None
+        # 石の座標。盤の左上原点で単位は盤の1辺[(float, float)]Y座標、X座標の順
+        self.position = None
+        # 対応する盤のマスの位置[(int, int)]Y座標、X座標の順
+        self.cell = None
+    
 class Board():
     
     def __init__(self):
-        self.white = 1
-        self.black = -1
-        self.blank = 0
         self.tablesize = 8
         self.cell = np.zeros((self.tablesize, self.tablesize))
         self.cell = self.cell.astype(int)
-        # 石の初期位置設定
-        self.cell[3][3] = self.cell[4][4] = self.white
-        self.cell[3][4] = self.cell[4][3] = self.black
-        self.current = self.black
+        # 石の初期位置設定 
+        self.cell[3][3] = self.cell[4][4] = DiscColor.WHITE
+        self.cell[3][4] = self.cell[4][3] = DiscColor.BLACK
+        self.current = DiscColor.BLACK
         self.pass_count = 0
         self.turn = 1
         
@@ -70,7 +88,7 @@ class Board():
     def check_can_reverse(self, x, y):
         if not self.rangecheck(x, y): # 盤内にあるかチェック
             return False
-        elif not self.cell[x][y] == self.blank: # すでに石がおいてあるかチェック
+        elif not self.cell[x][y] == DiscColor.EMPTY: # すでに石がおいてあるかチェック
             return False
         elif not self.can_reverse_stone(x, y): #着手した座標でひっくり返せる石があるかチェック
             return False
@@ -110,12 +128,21 @@ class Board():
     
     def display(self):  # 盤面の状況を表示
         print('==='*10)   #  *(下の文を参照）
-        for y in range(self.tablesize):
-            for x in range(self.tablesize):
-                if self.cell[x][y] == self.white:
+        for x in range(self.tablesize):
+            for y in range(self.tablesize):
+                if self.cell[x][y] == DiscColor.WHITE:
                     print('W', end = '  ')
-                elif self.cell[x][y] == self.black:
+                elif self.cell[x][y] == DiscColor.BLACK:
                     print('B', end = '  ')
                 else:
                     print('*', end = '  ')
             print('\n', end = '')
+
+class RealBoard(Board):
+    
+    def __init__(self):
+        # 石の初期位置設定 
+        self.tablesize = 8
+        self.current = DiscColor.BLACK
+        self.pass_count = 0
+        self.turn = 1

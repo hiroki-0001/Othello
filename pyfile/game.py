@@ -1,8 +1,8 @@
 import sys
-import osero
+import OthelloBoardSystem
 import numpy as np
 
-class Game(osero.Board):
+class Game(OthelloBoardSystem.RealBoard):
     
     def __init__(self):
         super().__init__()
@@ -10,13 +10,16 @@ class Game(osero.Board):
         self.black_count = 2
         self.blank_count = 60
         
+    def read_data(self, BoardData):
+        self.cell = BoardData
+        
     def pass_system(self):
         super().turnchange()
     
     def count_system(self):
-        self.white_count = np.sum(self.cell == self.white)
-        self.black_count = np.sum(self.cell == self.black)
-        self.blank_count = np.sum(self.cell == self.blank)
+        self.white_count = np.sum(self.cell == OthelloBoardSystem.DiscColor.WHITE)
+        self.black_count = np.sum(self.cell == OthelloBoardSystem.DiscColor.BLACK)
+        self.blank_count = np.sum(self.cell == OthelloBoardSystem.DiscColor.EMPTY)
         
     def game_set(self):
         print("game set !!!")
@@ -71,8 +74,3 @@ class Game(osero.Board):
             self.count_system()
             print('white : ', self.white_count, ', black : ', self.black_count, ', blank : ', self.blank_count)
         self.game_set()
-
-                
-if __name__ == '__main__':
-    game = Game()
-    game.gameplay()

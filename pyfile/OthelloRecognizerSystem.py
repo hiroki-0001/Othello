@@ -3,18 +3,12 @@ import numpy as np
 import math
 import functools
 from matplotlib import pyplot as plt
-from enum import IntEnum
+import OthelloBoardSystem
 
 ###
-### 入出力用のclass・Enumの定義
+### 入出力用のclass
 ###
-class DiscColor(IntEnum):
-    """
-    石の色用
-    """
-    BLACK = 0
-    WHITE = 1
-    
+
 class Hint():
     """
     認識するにあたってアプリ側から与えるヒント情報
@@ -27,18 +21,6 @@ class Hint():
         # 認識モード[Mode]
         self.mode = None
     
-class Disc():
-    """
-    石の情報格納用
-    """
-    def __init__(self):
-        # 石の色[DiscColor]
-        self.color = None
-        # 石の座標。盤の左上原点で単位は盤の1辺[(float, float)]Y座標、X座標の順
-        self.position = None
-        # 対応する盤のマスの位置[(int, int)]Y座標、X座標の順
-        self.cell = None
-
 class Result():
     """
     認識結果
@@ -534,7 +516,7 @@ class Recognizer():
         board = self.extractBoard(image, result.vertex, \
             [Recognizer._EXTRACT_IMG_SIZE, Recognizer._EXTRACT_IMG_SIZE], \
             ratio=1.0, margin=Recognizer._BOARD_MARGIN, outer=(96), fillMargin=False)
-        
+    
         # 盤の外部(枠外)を抽出
         outer = cv2.inRange(board, (254, 0, 0), (254, 0, 0))
         
@@ -563,6 +545,7 @@ class Recognizer():
 
         # グレースケールの盤の画像
         grayBoard = cv2.cvtColor(board, cv2.COLOR_BGR2GRAY)
+
 
         info = self.prepareInfoForDetectDisc(grayBoard)
         
@@ -639,13 +622,13 @@ class Recognizer():
         # 色の判定
         if areaWide >= 10:
             # 黒
-            self.setDisc(result, DiscColor.BLACK, bottomCoord, bottomIndex)
+            self.setDisc(result, OthelloBoardSystem.DiscColor.BLACK, bottomCoord, bottomIndex)
         elif areaNarrow >= 26:
             # 黒
-            self.setDisc(result, DiscColor.BLACK, bottomCoord, bottomIndex)
+            self.setDisc(result, OthelloBoardSystem.DiscColor.BLACK, bottomCoord, bottomIndex)
         else:
             # 白
-            self.setDisc(result, DiscColor.WHITE, bottomCoord, bottomIndex)
+            self.setDisc(result, OthelloBoardSystem.DiscColor.WHITE, bottomCoord, bottomIndex)
         
         return result
     
@@ -658,7 +641,7 @@ class Recognizer():
             return result
         
         # 石情報を追加
-        disc = Disc()
+        disc = OthelloBoardSystem.Disc()
         disc.color = color
         disc.position = coord
         disc.cell = index
@@ -672,8 +655,9 @@ class Recognizer():
         # 二値化
         # 見た目の色を判断するための広域的な二値化
         binBoardWide = cv2.adaptiveThreshold(grayBoard, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 127, -20)
+
         # 反射した石は少しまだらになるので、それが検出できるように近傍で二値化したものも作っておく
-        binBoardNarrow = cv2.adaptiveThreshold(grayBoard, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 7, 2)
+        binBoardNarrow = cv2.adaptiveThreshold(grayBoard, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 127, -20)
         binBoardNarrow = cv2.blur(binBoardNarrow, (3, 3))
         _, binBoardNarrow = cv2.threshold(binBoardNarrow, 168, 255, cv2.THRESH_BINARY)
 
