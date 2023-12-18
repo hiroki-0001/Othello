@@ -7,6 +7,13 @@ import sys
 
 if len(sys.argv) == 1 or sys.argv[1] == 'game':
     board = Board()
+    while True:
+        # 合法手生成とパス判定
+        if not board.check_legal():
+            board.player *= -1
+        
+        board.print_info()
+        board.move_stdin()
 
 elif  sys.argv[1] == 'robot':
 
