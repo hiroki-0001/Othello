@@ -57,6 +57,22 @@ class Result():
 ###
 ### ユーティリティ的な関数の定義
 ###
+
+def imageRotation(image, angle):
+    #高さを定義
+    height = image.shape[0]                         
+    #幅を定義
+    width = image.shape[1]  
+    #回転の中心を指定                          
+    center = (int(width/2), int(height/2))
+    #スケールを指定
+    scale = 1.0
+    #getRotationMatrix2D関数を使用
+    trans = cv2.getRotationMatrix2D(center, angle , scale)
+    #アフィン変換
+    image2 = cv2.warpAffine(image, trans, (width,height))
+    return image2
+
 def intersection(line0, line1):
     """
     2直線の交点を求める
@@ -505,6 +521,8 @@ class Recognizer():
         """
         return vtx
     
+
+    
     def detectDisc(self, image, result):
         """
         石の位置・色の認識を実行するための内部関数
@@ -516,7 +534,15 @@ class Recognizer():
         board = self.extractBoard(image, result.vertex, \
             [Recognizer._EXTRACT_IMG_SIZE, Recognizer._EXTRACT_IMG_SIZE], \
             ratio=1.0, margin=Recognizer._BOARD_MARGIN, outer=(96), fillMargin=False)
-    
+        
+        # 切り出した盤の画像を回転させる
+        board = imageRotation(board, -90)
+        
+        #デバッグ用
+        # board = cv2.cvtColor(board, cv2.COLOR_BGR2RGB)
+        # plt.imshow(board)
+        # plt.show()
+        
         # 盤の外部(枠外)を抽出
         outer = cv2.inRange(board, (254, 0, 0), (254, 0, 0))
         
