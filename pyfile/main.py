@@ -33,7 +33,7 @@ else:
     message = '''
 使い方
 
-【オセロで遊ぶ場合】
+【オセロゲームで遊ぶ場合】
     python main.py 
     または
     python main.py game
