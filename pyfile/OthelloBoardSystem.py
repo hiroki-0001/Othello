@@ -22,6 +22,7 @@ class DiscColor(IntEnum):
     WHITE = 1   # 白石
     EMPTY = 0   # 空白
     LEGAL = 2   # 合法手(着手できるマス)
+    UNKNOWN = 3 # 認識できなかったマス(カメラ使用限定)
 class Disc():
     """
     石の情報格納用
@@ -45,8 +46,10 @@ class Board():
         self.n_blackstones = 2
         self.n_whitestones = 2
     
-    def read_data(self, BoardData):
+    def read_image_data(self, BoardData):
         self.grid = BoardData
+        self.n_blackstones = np.count_nonzero(self.grid == DiscColor.BLACK)
+        self.n_whitestones = np.count_nonzero(self.grid == DiscColor.WHITE)
     
     def check_legal(self):
         """
