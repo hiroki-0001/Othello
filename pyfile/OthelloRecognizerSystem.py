@@ -216,7 +216,7 @@ class Recognizer():
         盤の範囲の認識(detect_board)と石の位置・色の認識(detect_disc)を実行
 
         image: ndarrayで元となる画像を指定
-        戻り値: 認識成否(bool)と、成功した場合は結果情報(Result)
+        戻り値: 認識成否ret(bool)と、成功した場合は結果情報(Result)
         """
         # 盤の検出処理
         ret, result = self.detectBoard(image, hint)

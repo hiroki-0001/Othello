@@ -1,15 +1,15 @@
-import OthelloBoardSystem
+from OthelloBoardSystem import *
 import OthelloRecognizerSystem 
-import game
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
 hint = OthelloRecognizerSystem.Hint()
-image = cv2.imread("image/sample1.JPG")
+image = cv2.imread("image/sample4.JPG")
 
 recognizer = OthelloRecognizerSystem.Recognizer()
 ret, result = recognizer.analyzeBoard(image, hint)
+board = Board()
 
 if ret:
     # 結果を配列に格納する。-2:不明、0:空き、-1:黒、1:白
@@ -18,14 +18,8 @@ if ret:
     for d in result.disc:
         BoardData[d.cell[0], d.cell[1]] = int(d.color)
     
-    print(BoardData)
-    game = game.Game()
-    game.read_data(BoardData)
-    game.gameplay()
-    
-        
-    
-    
+    board.read_data(BoardData)
+    board.print_info()
     
 else:
     print("正常に認識できませんでした")
