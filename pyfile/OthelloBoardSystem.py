@@ -146,16 +146,9 @@ class Board():
                     ny = y + dy[dr] * (d + 1)                
                     nx = x + dx[dr] * (d + 1)
                     self.grid[ny][nx] = self.player
-                    print(ny)
-                    print(nx)
-            
         
         # 着手部分の更新
         self.grid[y][x] = self.player
-        
-        print("n_flipped = ", n_flipped)
-        print("self.player = ", self.player)
-        print("AI  = ", self.player * -1)
         
         # 石数の更新
         if self.player == DiscColor.BLACK:
@@ -167,7 +160,6 @@ class Board():
         
         # 手番の更新
         self.player *= -1
-        print(self.player)
         
         # ひっくり返したのでTrueを返す
         return True
