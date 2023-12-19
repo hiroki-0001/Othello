@@ -5,8 +5,8 @@ board_cell_size = 30 # 単位[mm]
 class RobotSystem():
     
     def coord_trans(self, y, x):
-        y_coord = y * board_cell_size
-        x_coord = x * board_cell_size
+        y_coord = (y+1) * board_cell_size
+        x_coord = (x+1) * board_cell_size
         return y_coord, x_coord
         
     def format_json(self, y, x, reverse_call):
