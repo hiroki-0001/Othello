@@ -108,9 +108,12 @@ class Board():
     def move(self, y, x):
         """
         オセロでの着手を行う
-        y: aa
-        x: aa
-        戻り値: 着手した場合はTrue できなかった場合はFalse (bool型)
+        y: 着手予定のy軸座標(0 ~ 7)
+        x: 着手予定のx軸座標(0 ~ 7)
+        戻り値: 
+            着手できる場合はTrue できなかった場合はFalse (bool型)
+            reverse_coordinates: 反転が必要な石の座標 (robot mode 限定)
+            input_coordinate: 着手が決定した石の座標 (robot mode 限定)
         """
         # 置けるかの判定
         if not inside(y, x):
@@ -120,7 +123,7 @@ class Board():
             print('非合法手です')
             return False
         
-        # ひっくり返した枚数(着手したぶんはカウントしない)
+        # ひっくり返した枚数(着手した分はカウントしない)
         n_flipped = 0
         
         # 8方向それぞれ合法か見ていき、合法ならひっくり返す
@@ -149,9 +152,11 @@ class Board():
                     ny = y + dy[dr] * (d + 1)                
                     nx = x + dx[dr] * (d + 1)
                     self.grid[ny][nx] = self.player
+                    
         
         # 着手部分の更新
         self.grid[y][x] = self.player
+        # input_coordinate
         
         # 石数の更新
         if self.player == DiscColor.BLACK:

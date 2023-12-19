@@ -5,6 +5,8 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import sys
+import pyrealsense2 as rs
+import time
 
 if len(sys.argv) == 1 or sys.argv[1] == 'game':
     
@@ -56,19 +58,24 @@ elif  sys.argv[1] == 'robot':
     hint = OthelloRecognizerSystem.Hint()
     recognizer = OthelloRecognizerSystem.Recognizer()
 
-    # カメラデバイスの設定
-    camera_device = 0
-    # カメラを開く
-    cap = cv2.VideoCapture(camera_device)
+    # ストリーム(Color/Depth)の設定
+    pipeline = rs.pipeline()
+    config = rs.config()
+    config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+    # ストリーミング開始
+    pipeline.start(config)
+    time.sleep(1) #画像全体が明るくなるまで待つ
     
     while True:
-        # 画像をキャプチャする
-        ret, image = cap.read()
-        if ret == False: # 画像が取得できない場合はやり直し
-            continue
+        frames = pipeline.wait_for_frames()
+        color_frame = frames.get_color_frame()
+        # フレームをnumpy arrayに変換
+        color_image = np.asanyarray(color_frame.get_data())
+        # フレームを表示
+        cv2.imwrite("image.jpg", color_image)
+        image = cv2.imread("image.jpg")
         
-        # 画像を保存する
-        cv2.imwrite("image.jpg", image)
+        # image = cv2.imread("image/sample4.JPG")
         
         ret, result = recognizer.analyzeBoard(image, hint)
 
@@ -106,9 +113,9 @@ elif  sys.argv[1] == 'robot':
         else:
             print("オセロ盤を正常に認識できませんでした")
 
-    # カメラを閉じる
-    cap.release()
-        
+    # ストリーミング停止
+    pipeline.stop()
+    
 else:
     message = '''
 使い方
