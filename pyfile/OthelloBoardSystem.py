@@ -1,4 +1,5 @@
 import numpy as np
+from ConnectRobotSystem import *
 from enum import IntEnum
 
 """
@@ -57,7 +58,6 @@ class Board():
         
         戻り値: 合法手があればTrue なければFalse (bool型)
         """
-        
         # 盤面の合法手表示をなくす
         for ny in range(tablesize):
             for nx in range(tablesize):
@@ -105,7 +105,8 @@ class Board():
         # 合法手が1つ以上あるかを返す
         return have_legal
                         
-    def move(self, y, x):
+    def move(self, y, x, board_player):
+        RS = RobotSystem()
         """
         オセロでの着手を行う
         y: 着手予定のy軸座標(0 ~ 7)
@@ -152,12 +153,19 @@ class Board():
                     ny = y + dy[dr] * (d + 1)                
                     nx = x + dx[dr] * (d + 1)
                     self.grid[ny][nx] = self.player
+                    if board_player == self.player:
+                        y_coord, x_coord = RS.coord_trans(ny, nx)
+                        json_data = RS.format_json(y_coord, x_coord, True)
+                        RS.send_data(json_data)
                     
-        
         # 着手部分の更新
         self.grid[y][x] = self.player
-        # input_coordinate
-        
+        if board_player == self.player:
+            y_coord, x_coord = RS.coord_trans(y, x)
+            json_data = RS.format_json(y_coord, x_coord, False)
+            RS.send_data(json_data)
+            
+            
         # 石数の更新
         if self.player == DiscColor.BLACK:
             self.n_blackstones += n_flipped + 1

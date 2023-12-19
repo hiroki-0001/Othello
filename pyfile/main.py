@@ -36,7 +36,7 @@ if len(sys.argv) == 1 or sys.argv[1] == 'game':
         if board.player == ai_player:
             ai.getdata(board.grid)
             y, x = ai.move()
-            board.move(y, x)
+            board.move(y, x, board.player)
         else:
             board.move_stdin()
 
@@ -101,13 +101,12 @@ elif  sys.argv[1] == 'robot':
                 print("CPUのターンです")
                 ai.getdata(board.grid)
                 y, x = ai.move()
-                board.move(y, x)
+                board.move(y, x, board.player)
                 pass # robotの操作を実装する
             else:
                 print("playerのターンです")
                 board.move_stdin()
                 
-            
             board.print_info()
             
         else:
