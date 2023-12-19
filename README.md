@@ -1,4 +1,4 @@
-# osero
+# othello
 
 realsense D435-i　基本セットアップ
 
